@@ -12,6 +12,7 @@ function App() {
     fetch('https://api.coingecko.com/api/v3/simple/price?ids=island-token&vs_currencies=usd')
   .then(response => response.json())
   .then(data => {
+    setIslandPrice(data['island-token']?.usd || 0);
     const islandPrice = data['island-token']?.usd || 0;
     // Use islandPrice in your application
   })
@@ -35,6 +36,8 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
+      <h1>ISLAND Token Price</h1>
+      <p>{islandPrice ? `$${islandPrice}` : 'Loading...'}</p>
         <h1>ISLAND Token Calculators</h1>
         <div className="calculator-selector">
           <button
