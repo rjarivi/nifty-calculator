@@ -5,6 +5,7 @@ const PlayToEarnCalculator = () => {
   const [intensity, setIntensity] = useState('casual');
   const [stakedAmount, setStakedAmount] = useState(0);
   const [compoundRate, setCompoundRate] = useState(100);
+  const [annualGains, setAnnualGains] = useState(0);
   const [palms, setPalms] = useState({
     iron: 0,
     bronze: 0,
@@ -38,20 +39,51 @@ const PlayToEarnCalculator = () => {
     setPalms((prev) => ({ ...prev, [name]: Number(value) }));
   };
 
-  const calculateEarnings = () => {
-    const blooms = playIntensities[intensity].bloomsPerCycle;
-    const earningRate = stakedAmount * 0.001; // Example calculation
-    const cycleCap = 100 + palms.iron * 200 + palms.bronze * 400; // Simplified example
-    const preCapIsland = blooms * earningRate;
-    const islandEarned = Math.min(preCapIsland, cycleCap);
-    const usdEarned = islandEarned * 0.1; // Example token price
+ // Example function to calculate earnings
+  const calculateEarnings = (dailyBlooms, price) => {
+    const daily = dailyBlooms * price;  // Assuming the number of blooms is multiplied by price
+    const cycle = daily * 10;  // Assuming a 10-day cycle for calculation
+    const yearly = daily * 365;  // Yearly estimate based on daily earnings
 
-    return {
-      preCapIsland,
-      islandEarned,
-      usdEarned,
-    };
+    setDailyGains(daily);
+    setCycleGains(cycle);
+    setAnnualGains(yearly);
   };
+
+  return (
+    <div className="calculator">
+      <h1>ISLAND Token Earnings Calculator</h1>
+      
+      {/* Dropdown for Play Intensity */}
+      <div>
+        <h2>Play Intensity</h2>
+        <select onChange={(e) => calculateEarnings(Number(e.target.value), islandPrice)}>
+          <option value="1500">Casual: 1,500 Blooms per Day</option>
+          <option value="3000">Medium: 3,000 Blooms per Day</option>
+          <option value="6000">High: 6,000 Blooms per Day</option>
+          <option value="14000">Super User: 14,000 Blooms per Day</option>
+        </select>
+      </div>
+
+      {/* Earnings Display */}
+      <div className="earnings">
+        <h3>Daily Earnings</h3>
+        <p>{dailyGains ? `$${dailyGains.toFixed(2)}` : 'Loading...'} ISLAND</p>
+
+        <h3>Cycle Earnings (10 days)</h3>
+        <p>{cycleGains ? `$${cycleGains.toFixed(2)}` : 'Loading...'} ISLAND</p>
+
+        <h3>Yearly Earnings</h3>
+        <p>{annualGains ? `$${annualGains.toFixed(2)}` : 'Loading...'} ISLAND</p>
+      </div>
+
+      {/* Display token price */}
+      <p>Current ISLAND Token Price: {islandPrice ? `$${islandPrice}` : 'Loading...'}</p>
+    </div>
+  );
+}
+
+export default Calculator;
 
   const earnings = calculateEarnings();
 
