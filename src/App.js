@@ -10,10 +10,15 @@ function App() {
   useEffect(() => {
     // Fetch ISLAND token price from CoinGecko API
     fetch('https://api.coingecko.com/api/v3/simple/price?ids=island-token&vs_currencies=usd')
-      .then(response => response.json())
-      .then(data => setIslandPrice(data['island-token']?.usd || 0))
-      .catch(error => console.error('Error fetching ISLAND token price:', error));
-  }, []);
+  .then(response => response.json())
+  .then(data => {
+    const islandPrice = data['island-token']?.usd || 0;
+    // Use islandPrice in your application
+  })
+  .catch(error => {
+    console.error('Error fetching ISLAND token price:', error);
+    // Handle error appropriately
+  });
 
   const handlePlayIntensityChange = (event) => {
     setPlayIntensity(event.target.value);
