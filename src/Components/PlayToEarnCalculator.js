@@ -1,11 +1,9 @@
-// src/components/PlayToEarnCalculator.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const PlayToEarnCalculator = () => {
   const [intensity, setIntensity] = useState('casual');
   const [stakedAmount, setStakedAmount] = useState(0);
   const [compoundRate, setCompoundRate] = useState(100);
-  const [annualGains, setAnnualGains] = useState(0);
   const [palms, setPalms] = useState({
     iron: 0,
     bronze: 0,
@@ -14,7 +12,14 @@ const PlayToEarnCalculator = () => {
     neon: 0,
     ultra: 0,
   });
+  
+  // State for storing earnings and ISLAND token price
+  const [dailyGains, setDailyGains] = useState(0);
+  const [cycleGains, setCycleGains] = useState(0);
+  const [annualGains, setAnnualGains] = useState(0);
+  const [islandPrice, setIslandPrice] = useState(null);
 
+  // Intensity settings for different levels
   const playIntensities = {
     casual: { bloomsPerDay: 1500, bloomsPerCycle: 15000 },
     medium: { bloomsPerDay: 3000, bloomsPerCycle: 30000 },
@@ -22,8 +27,22 @@ const PlayToEarnCalculator = () => {
     super: { bloomsPerDay: 14000, bloomsPerCycle: 140000 },
   };
 
+  // Fetch the ISLAND token price from CoinGecko API
+  useEffect(() => {
+    fetch('https://api.coingecko.com/api/v3/simple/price?ids=island-token&vs_currencies=usd')
+      .then(response => response.json())
+      .then(data => {
+        setIslandPrice(data['island-token']?.usd || 0);
+      })
+      .catch(error => {
+        console.error('Error fetching ISLAND token price:', error);
+      });
+  }, []);
+
+  // Handle changes for intensity, staked amount, compound rate, and palms
   const handleIntensityChange = (e) => {
     setIntensity(e.target.value);
+    calculateEarnings(playIntensities[e.target.value].bloomsPerDay);
   };
 
   const handleStakedAmountChange = (e) => {
@@ -39,10 +58,12 @@ const PlayToEarnCalculator = () => {
     setPalms((prev) => ({ ...prev, [name]: Number(value) }));
   };
 
- // Example function to calculate earnings
-  const calculateEarnings = (dailyBlooms, price) => {
-    const daily = dailyBlooms * price;  // Assuming the number of blooms is multiplied by price
-    const cycle = daily * 10;  // Assuming a 10-day cycle for calculation
+  // Function to calculate earnings
+  const calculateEarnings = (dailyBlooms) => {
+    if (!islandPrice) return;
+
+    const daily = dailyBlooms * islandPrice;  // Daily earnings
+    const cycle = daily * 10;  // 10-day cycle earnings
     const yearly = daily * 365;  // Yearly estimate based on daily earnings
 
     setDailyGains(daily);
@@ -57,11 +78,11 @@ const PlayToEarnCalculator = () => {
       {/* Dropdown for Play Intensity */}
       <div>
         <h2>Play Intensity</h2>
-        <select onChange={(e) => calculateEarnings(Number(e.target.value), islandPrice)}>
-          <option value="1500">Casual: 1,500 Blooms per Day</option>
-          <option value="3000">Medium: 3,000 Blooms per Day</option>
-          <option value="6000">High: 6,000 Blooms per Day</option>
-          <option value="14000">Super User: 14,000 Blooms per Day</option>
+        <select value={intensity} onChange={handleIntensityChange}>
+          <option value="casual">Casual: 1,500 Blooms per Day</option>
+          <option value="medium">Medium: 3,000 Blooms per Day</option>
+          <option value="high">High: 6,000 Blooms per Day</option>
+          <option value="super">Super User: 14,000 Blooms per Day</option>
         </select>
       </div>
 
@@ -79,26 +100,8 @@ const PlayToEarnCalculator = () => {
 
       {/* Display token price */}
       <p>Current ISLAND Token Price: {islandPrice ? `$${islandPrice}` : 'Loading...'}</p>
-    </div>
-  );
-}
 
-export default Calculator;
-
-  const earnings = calculateEarnings();
-
-  return (
-    <div>
-      <h2>Play to Earn Calculator</h2>
-      <label>
-        Play Intensity:
-        <select value={intensity} onChange={handleIntensityChange}>
-          <option value="casual">Casual</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
-          <option value="super">Super User</option>
-        </select>
-      </label>
+      {/* Other inputs for staked amount, palms, etc. */}
       <label>
         Staked Amount:
         <input
@@ -129,14 +132,8 @@ export default Calculator;
           </label>
         ))}
       </div>
-      <div>
-        <h3>Earnings:</h3>
-        <p>Pre-Cap ISLAND: {earnings.preCapIsland.toFixed(2)}</p>
-        <p>ISLAND Earned: {earnings.islandEarned.toFixed(2)}</p>
-        <p>USD Earned: ${earnings.usdEarned.toFixed(2)}</p>
-      </div>
     </div>
   );
-};
+}
 
 export default PlayToEarnCalculator;
