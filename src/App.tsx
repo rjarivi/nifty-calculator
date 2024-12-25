@@ -1,6 +1,25 @@
+// src/App.tsx
 import React from 'react';
 import { Calculator, Coins, Palmtree, TrendingUp } from 'lucide-react';
+import StakingBoost from './StakingBoost';
+import Footer from './Footer';
 
+// Existing configurations...
+
+function App() {
+  return (
+    <div className="min-h-screen bg-[#0F1014] text-white">
+      <Header />
+      <div className="container mx-auto py-8 px-4">
+        <StakingBoost />
+        <Calculator />
+      </div>
+      <Footer />
+    </div>
+  );
+}
+
+export default App;
 // Play intensity configurations
 const PLAY_INTENSITIES = {
   casual: { name: 'Casual', bloomsPerDay: 1500, bloomsPerCycle: 15000 },
