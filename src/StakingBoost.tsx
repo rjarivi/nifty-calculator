@@ -1,6 +1,5 @@
 // src/StakingBoost.tsx
 import React, { useState } from 'react';
-
 const StakingBoost = () => {
   const [stakedIsland, setStakedIsland] = useState(0);
   const [boost, setBoost] = useState(0);
@@ -10,12 +9,10 @@ const StakingBoost = () => {
     setStakedIsland(value);
     calculateBoost(value);
   };
-
   const calculateBoost = (staked: number) => {
     const boostValue = staked * 0.001; // Example formula
     setBoost(boostValue > 360 ? 360 : +boostValue.toFixed(2));
   };
-
   return (
     <div className="staking-boost">
       <h3 className="text-xl font-semibold">Staking Boost</h3>
